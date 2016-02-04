@@ -22,6 +22,7 @@ module.exports = function(grunt) {
                   "src/fonts/vexflow_font.js",
                   "src/glyph.js",
                   "src/stave.js",
+                  "src/stavegroup.js",
                   "src/staveconnector.js",
                   "src/tabstave.js",
                   "src/tickcontext.js",
