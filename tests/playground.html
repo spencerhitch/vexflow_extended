@@ -16,7 +16,7 @@
   </style>
 
   <!-- Vexflow Source -->
-  <script src="../build/vexflow-min.js"></script>
+  <script src="../build/vexflow-debug.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 </head>
 
@@ -25,22 +25,26 @@
 
   <div class="two" style="float:left;width:600;">
       <div class="b">
-        <canvas width="525" height="120"></canvas>
+        <canvas width="525"></canvas>
     </div>
   </div>
 
 <script>
 var canvas = $("div.two div.b canvas")[0];
 var renderer = new Vex.Flow.Renderer(canvas,
-Vex.Flow.Renderer.Backends.CANVAS);
+          Vex.Flow.Renderer.Backends.CANVAS);
 
 var ctx = renderer.getContext();
+
 var stavegroup = new Vex.Flow.StaveGroup(10, 0, 500);
 
 // Add a stave with instrument option being piano
-stavegroup.addStave("piano");
+stavegroup.addStave();
+stavegroup.addStave();
+
 console.log(stavegroup);
-//stave.setContext(ctx).draw();
+
+stavegroup.setContext(ctx).draw();
 
 
 </script>

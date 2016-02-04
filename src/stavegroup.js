@@ -1,7 +1,7 @@
 // Vex Flow
 // Mohit Muthanna <mohit@muthanna.com>
-// Spencer Hitchcock <spencerhitch@gmail.com>:
-// 
+// Spencer Hitchcock <spencerhitch@gmail.com>
+// A superclass for staves, this will allow multiple instruments to be scored at once
 
 /** @constructor */
 Vex.Flow.StaveGroup = (function() {
@@ -17,13 +17,14 @@ Vex.Flow.StaveGroup = (function() {
       this.y = y;
       this.width = width;
       this.context = null;
+      this.staves = [];
       this.font = {
         family: "sans-serif",
         size: 8,
         weight: ""
       };
       this.options = {
-        num_staves: 1,
+        spacing_between_staves_px: 60,
         space_above_stavegroup: 4,      // in staff lines
         space_below_stavegroup: 4      // in staff lines
       };
@@ -32,15 +33,27 @@ Vex.Flow.StaveGroup = (function() {
 
       this.resetStaves();
     },
+    addStave: function() {
+      var num_staves = this.staves.length;
+      var width = this.width;
+      var x = this.x;
+      var y = this.getYForStave(num_staves);
+      this.staves.push(new Vex.Flow.Stave(x,y,width));
+      this.resetStaves();
+    },
+
+    getStave: function(i) {
+        return this.staves[i];
+    },
 
     resetStaves: function() {
       this.options.stave_config = [];
-      for (var i = 0; i < this.options.num_staves; i++) {
+      for (var i = 0; i < this.staves.length; i++) {
         this.options.stave_config.push({visible: true});
       }
-      this.height = (this.options.num_staves*5 + this.options.space_above_stavegroup) *
-         this.options.spacing_between_staves;
-      this.options.bottom_text_position = this.options.num_staves + 1;
+      this.height = (this.staves.length + this.options.space_above_stavegroup) *
+         this.options.spacing_between_staves_px;
+      this.options.bottom_text_position = this.staves.length + 1;
     },
 
     setContext: function(context) {
@@ -54,9 +67,9 @@ Vex.Flow.StaveGroup = (function() {
     },
     getContext: function() { return this.context; },
     getX: function() { return this.x; },
-    getNumStaves: function() { return this.options.num_staves; },
+    getNumStaves: function() { return this.staves.length; },
     setNumStaves: function(staves) {
-      this.options.num_staves = parseInt(staves, 10);
+      this.staves.length = parseInt(staves, 10);
       this.resetStaves();
       return this;
     },
@@ -125,23 +138,21 @@ Vex.Flow.StaveGroup = (function() {
     getBottomY: function() {
       var options = this.options;
       var spacing = options.spacing_between_staves_px;
-      var score_bottom = this.getYForLine(options.num_staves) +
+      var score_bottom = this.getYForLine(staves.length) +
          (options.space_below_staff_ln * spacing);
 
       return score_bottom;
     },
 
     getBottomStaveY: function() {
-      return this.getYForStave(this.options.num_staves);
+      return this.getYForStave(this.staves.length);
     },
 
-    getYForStave: function(stave) {
+    getYForStave: function(stave_index) {
       var options = this.options;
-      var spacing = options.spacing_between_stave_px;
-      var headroom = options.space_above_staff_ln;
+      var spacing = options.spacing_between_staves_px;
 
-      var y = this.y + ((stave * spacing) + (headroom * spacing)) -
-        (THICKNESS / 2);
+      var y = this.y + (stave_index * spacing);
 
       return y;
     },
@@ -153,18 +164,15 @@ Vex.Flow.StaveGroup = (function() {
       if (!this.context) throw new Vex.RERR("NoCanvasContext",
           "Can't draw stave without canvas context.");
 
-      var num_staves = this.options.num_staves;
-      var width = this.width;
-      var x = this.x;
-      var y;
+      var num_staves = this.staves.length;
 
       // Render staves 
-      for (var stave_index=0; stave < num_staves; stave_index++) {
-        y = this.getYForStave(stave_index);
+      for (var stave_index=0; stave_index < num_staves; stave_index++) {
 
         this.context.save();
-        var stave = new  Vex.Flow.Stave(x,y,width);
-        stave.setContext(this.context).draw();
+        var stave = this.getStave(stave_index);
+        console.log(stave);
+        stave.draw();
         this.context.restore();
       }
 
@@ -246,5 +254,5 @@ Vex.Flow.StaveGroup = (function() {
 //    }
   };
 
-  return Stave;
+  return StaveGroup;
 }());
